@@ -7,6 +7,7 @@ Camera::Camera()
 }
 
 Camera::Camera(Vector4d const & z_vector, float rad):
+	z_vector(z_vector),  radius_vector(0, 0, rad, 0)
 {
 }
 
