@@ -45,6 +45,64 @@ Matrix4d Matrix4d::operator*(Matrix4d const & mat) const
 	return result;
 }
 
+void Matrix4d::SetDisplacementVector(Vector4d const & displace_vector)
+{
+	matrix_data[0][3] = displace_vector.x;
+	matrix_data[1][3] = displace_vector.y;
+	matrix_data[2][3] = displace_vector.z;
+}
+
+
+Matrix4d Matrix4d::FindInverseMatrix() const
+{
+	float inverse_matrix[4][4];
+	float matrix_of_cofactors[3][3];
+	FindMatrixOfCofactors(matrix_of_cofactors);
+	//float determinant = FindDeterminantOfMatrix(matrix_of_cofactors);
+	TransformMatrix3x3(matrix_of_cofactors);
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			//matrix_of_cofactors[i][j] /= determinant;
+			inverse_matrix[i][j] = matrix_of_cofactors[i][j];
+		}
+	}
+	inverse_matrix[3][3] = 1;
+	Vector4d offset(matrix_data[0][3], matrix_data[1][3], matrix_data[2][3], 0);
+	Matrix4d result(inverse_matrix);
+	result.SetDisplacementVector(result * offset * -1);
+	return result;
+}
+
+float Matrix4d::FindDeterminantOfMatrix(float matrix_of_cofactors[3][3]) const
+{
+	float determinant = 0.0f;
+	for (int i = 0; i < 3; ++i) {
+		determinant += matrix_data[0][i] * matrix_of_cofactors[0][i] ;
+	}
+	return determinant;
+}
+
+void Matrix4d::FindMatrixOfCofactors(float matrix_of_cofactors[3][3]) const
+{
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			int i1 = (i + 1) % 3;
+			int i2 = (i + 2) % 3;
+			int j1 = (j + 1) % 3;
+			int j2 = (j + 2) % 3;
+			matrix_of_cofactors[i][j] = matrix_data[i1][j1] * matrix_data[i2][j2] -
+				matrix_data[i1][j2] * matrix_data[i2][j1];
+		}
+	}
+}
+
+void Matrix4d::TransformMatrix3x3(float matrix[3][3]) const
+{
+	std::swap(matrix[0][1], matrix[1][0]);
+	std::swap(matrix[0][2], matrix[2][0]);
+	std::swap(matrix[2][1], matrix[1][2]);
+}
+
 Matrix4d Matrix4d::perspectiveProjectionMatrix(float alpha, float beta, float near, float far)
 {
 	near = -near;
@@ -120,6 +178,18 @@ Matrix4d Matrix4d::rotateAboutX(float alpha)
 		{ 1, 0, 0, 0 },
 		{ 0, cos, -sin, 0 },
 		{ 0, sin, cos, 0 },
+		{ 0, 0, 0, 1 }
+	};
+	return Matrix4d(result);
+}
+
+Matrix4d Matrix4d::rotateAboutY(float alpha)
+{
+	float cos = std::cosf(alpha), sin = std::sinf(alpha);
+	float result[4][4] = {
+		{ cos, 0, -sin, 0 },
+		{ 0, 1, 0, 0 },
+		{ sin, 0, cos, 0 },
 		{ 0, 0, 0, 1 }
 	};
 	return Matrix4d(result);

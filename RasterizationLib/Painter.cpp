@@ -12,27 +12,33 @@ Painter::Painter(HDC thdc, int w, int h): hdc(thdc), width(w), height(h)
 }
 
 
-void Painter::DrawCube(Cube & cube, BYTE* image_buffer) const
+void Painter::DrawCube(Cube & cube, Camera const& camera,
+	bool rotate_flag, float material_specular_exponent, 
+	Pixel* left_border_buffer, Pixel* right_border_buffer,
+	BYTE* image_buffer) const
 {
 	Matrix4d rotate = Matrix4d::rotateAboutVector(
 		Vector4d(0, cosf(0.6f), sinf(0.6f), 0), // vector around which rotates
 		float(1.0f / 180.0f * M_PI));			  // the angle of rotation
-
 	Triangle cube_triangles[12];
 	
- 	cube.rotateCube(rotate);
+	if (rotate_flag) {
+		cube.rotateCube(rotate);
+	}
 	cube.giveTriangles(cube_triangles);
 
 	Matrix4d projection_to_clip_space = Matrix4d::perspectiveProjectionMatrix(1, 1, -1, -1000);
 	Matrix4d projection_to_screen = Matrix4d::projectionToScreen(float(width), float(height));
-	Matrix4d result_transform_matrix = projection_to_screen * projection_to_clip_space;
+	Matrix4d result_transform_matrix = projection_to_screen * projection_to_clip_space ;
 
-	Pixel left_border_buffer[500];
-	Pixel right_border_buffer[500];
+	LightSource ls(camera.transform_matrix_from_world_to_camera_space * Vector4d(0, 0, 1000000, 1),
+		Color(1, 1, 1), 1, 0, 0);
 
 	for (int i = 0; i < 12; ++i) {
+		cube_triangles[i].TransformTriangle(camera.transform_matrix_from_world_to_camera_space);
 		ComplexTriangle triangle_for_rasterization = cube_triangles[i];
 		RasterizeTriangle(triangle_for_rasterization, result_transform_matrix,
+			ls, material_specular_exponent,
 			left_border_buffer, right_border_buffer, image_buffer);
 	}
 
@@ -41,17 +47,14 @@ void Painter::DrawCube(Cube & cube, BYTE* image_buffer) const
 
 
 void Painter::RasterizeTriangle(ComplexTriangle& triangle, Matrix4d& transform_matrix,
+	LightSource const& ls, float material_specular_exponent,
 	Pixel* left_border_buffer, Pixel* right_border_buffer,
 	BYTE* image_buffer) const
 {
-	static LightSource ls(Vector4d( 0, 0, 1000000, 1), Color(1, 1, 1), 1, 0, 0);
-	Color ambient(0.1f, 0.1f, 0.1f);
 	
-	Vector4d z(0, 0, 1.0f, 0);
-	triangle.calculateNormalVector();
-	if (help_functions::dotProduct(triangle.normal_vector, z) < 0.0f) {
-		return;
-	}
+	Color ambient(0.2f, 0.2f, 0.2f);
+	
+	triangle.CalculateNormalVector();
 	triangle.normal_vector.normalize();
 
 	for (int i = 0; i < 3; ++i) {
@@ -74,7 +77,9 @@ void Painter::RasterizeTriangle(ComplexTriangle& triangle, Matrix4d& transform_m
 	for (int i = 0; i < 3; ++i) {
 		temporary_simple_triangle_in_screen_space.vertices[i] = triangle.complex_vertices[i].position;
 	}
-	temporary_simple_triangle_in_screen_space.calculateNormalVector();
+	temporary_simple_triangle_in_screen_space.CalculateNormalVector();
+	Vector4d z(0, 0, 1, 0);
+
 	if (help_functions::dotProduct(temporary_simple_triangle_in_screen_space.normal_vector, z) > 0.0f) {
 		return;
 	}
@@ -94,8 +99,9 @@ void Painter::RasterizeTriangle(ComplexTriangle& triangle, Matrix4d& transform_m
 	for (int i = 0; i < triangle_height; ++i) {
 		assert(right_border_buffer[i].y == left_border_buffer[i].y);
 		int pos_y = right_border_buffer[i].y;
-
+		//assert(pos_y > 0 && pos_y < height);
 		for (int pos_x = left_border_buffer[i].x; pos_x <= right_border_buffer[i].x; ++pos_x) {
+			//assert(pos_x > 0 && pos_x < width);
 			Vector4d vector_to_point(float(pos_x), float(pos_y), 0, 1);
 			float barycentric_coordinates[3];
 			triangle.calculateBarycenticCoodinates(vector_to_point, triangle_area, barycentric_coordinates);
@@ -114,7 +120,6 @@ void Painter::RasterizeTriangle(ComplexTriangle& triangle, Matrix4d& transform_m
 
 			//calculate pixel color with Phong shading
 			Color diffuse_term, specular_term;
-			float material_specular_exponent = 20.0f;
 			ls.calculateShading(vertex_position, vertex_normal, material_specular_exponent, diffuse_term, specular_term);
 			Color pixel_color = (diffuse_term + ambient) * vertex_diffuse_color + specular_term * vertex_specular_color;
 			pixel_color.getSafeColor();

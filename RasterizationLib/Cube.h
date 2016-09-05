@@ -8,7 +8,7 @@
 struct Cube
 {
 	Cube();
-	Cube(Vector4d z_vector, Vector4d center, float rad);
+	Cube(Vector4d const& z_vector, Vector4d const& center, float rad);
 	void calulateCenterMatrix();
 	void rotateCube(Matrix4d const& rotate_matrix);
 	void generateVertices(Vector4d* vertex_set) const;

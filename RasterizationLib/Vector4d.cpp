@@ -24,8 +24,6 @@ void Vector4d::persrectiveDivide()
 }
 
 
-
-
 Vector4d::~Vector4d()
 {
 }

@@ -1,11 +1,10 @@
-﻿  stdafx.cpp
+﻿  Camera.cpp
   ComplexTriangle.cpp
   Cube.cpp
-  help_functions.cpp
   LightSource.cpp
   Matrix4d.cpp
   Painter.cpp
   Triangle.cpp
-  Vector4d.cpp
   Vertex.cpp
+  help_functions.cpp
   RasterizationLib.vcxproj -> C:\Users\kek\Documents\GitHub\Rasterization\x64\Release\RasterizationLib.lib

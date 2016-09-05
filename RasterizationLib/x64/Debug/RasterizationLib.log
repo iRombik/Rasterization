@@ -1,1 +1,13 @@
-﻿  RasterizationLib.vcxproj -> C:\Users\kek\Documents\GitHub\Rasterization\x64\Debug\RasterizationLib.lib
+﻿  Triangle.cpp
+  Painter.cpp
+  Matrix4d.cpp
+  LightSource.cpp
+  Camera.cpp
+  Создание кода...
+  Компиляция...
+  help_functions.cpp
+  Vertex.cpp
+  Cube.cpp
+  ComplexTriangle.cpp
+  Создание кода...
+  RasterizationLib.vcxproj -> C:\Users\kek\Documents\GitHub\Rasterization\x64\Debug\RasterizationLib.lib

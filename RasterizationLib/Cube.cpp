@@ -16,7 +16,8 @@ Cube::Cube()
 }
 
 
-Cube::Cube(Vector4d z_vec, Vector4d center_vec, float rad): z_vector(z_vec), offset_vector(center_vec), radius(rad)
+Cube::Cube(Vector4d const& z_vec, Vector4d const& center_vec, float rad):
+	z_vector(z_vec), offset_vector(center_vec), radius(rad)
 {
 }
 
@@ -34,7 +35,7 @@ void Cube::calulateCenterMatrix()
 		{ x_vector.x, x_vector.y, x_vector.z, offset_vector.coordinate[0] },
 		{ y_vector.x, y_vector.y, y_vector.z, offset_vector.coordinate[1] },
 		{ z_vector.x, z_vector.y, z_vector.z, offset_vector.coordinate[2] },
-		{ 0, 0, 0, offset_vector.coordinate[3] }
+		{ 0, 0, 0, 1 }
 	};
 	this->center = center_coordinate;
 }

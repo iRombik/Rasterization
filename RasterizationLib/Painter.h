@@ -6,14 +6,20 @@
 #include "Matrix4d.h" 
 #include "LightSource.h"
 #include "help_functions.h"
+#include "Camera.h"
 
 class Painter
 {
 public:
 	Painter();
 	Painter(HDC thdc, int w, int h);
-	void DrawCube(Cube & cube, BYTE* image_buffer) const;
+	void DrawCube(Cube & cube, Camera const& camera,
+		bool rotate_flag, float material_specular_exponent,
+		Pixel* left_border_buffer, Pixel* right_border_buffer,
+		BYTE* image_buffer) const;
+
 	void RasterizeTriangle(ComplexTriangle& triangle, Matrix4d& transform_matrix,
+		LightSource const& ls, float material_specular_exponent,
 		Pixel* left_border_buffer, Pixel* right_border_buffer,
 		BYTE* image_buffer) const;
 

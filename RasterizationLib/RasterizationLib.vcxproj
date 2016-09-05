@@ -130,6 +130,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="ComplexTriangle.h" />
     <ClInclude Include="Cube.h" />
@@ -145,6 +146,7 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ComplexTriangle.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="help_functions.cpp" />

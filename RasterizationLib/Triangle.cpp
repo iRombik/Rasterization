@@ -17,8 +17,15 @@ Triangle::Triangle(Vector4d const tmp_vertices[3])
 	vertices[2] = tmp_vertices[2];
 }
 
+void Triangle::TransformTriangle(Matrix4d const & transform_matrix)
+{
+	vertices[0] = transform_matrix * vertices[0];
+	vertices[1] = transform_matrix * vertices[1];
+	vertices[2] = transform_matrix * vertices[2];
+}
 
-void Triangle::calculateNormalVector()
+
+void Triangle::CalculateNormalVector()
 {
 	normal_vector = help_functions::crossProduct(vertices[1] - vertices[0],
 		vertices[2] - vertices[0]);
