@@ -19,7 +19,7 @@ public:
 	void rotateToLeft();
 	void rotateToRight();
 
-	float coefficient_of_rotate = 0.1f;
+	float coefficient_of_rotate = 0.04f;
 	Vector4d radius_vector, offset_vector, z_vector;
 	Matrix4d transform_matrix_from_camera_to_world_space;
 	Matrix4d transform_matrix_from_world_to_camera_space;
